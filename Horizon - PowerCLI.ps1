@@ -1,17 +1,21 @@
 
 <#
 .SYNOPSIS
-Samples Scripts Using the VMware Horizon API via PowerCLI
+Script to output Horizon Session data to .CSV via PowerCLI
 	
 .NOTES
   Version:        1.0
   Author:         Chris Halstead - chalstead@vmware.com
-  Creation Date:  7/18/2019
+  Creation Date:  1/20/2021
   Purpose/Change: Initial script development
  #>
 
 #----------------------------------------------------------[Declarations]----------------------------------------------------------
 [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
+$script:mydocs = [environment]::getfolderpath('mydocuments')
+$script:date = Get-Date -Format d 
+$script:date = $script:date -replace "/","_"
+
 #-----------------------------------------------------------[Functions]------------------------------------------------------------
 Function LogintoHorizon {
 
@@ -28,7 +32,7 @@ $UnsecurePassword = [System.Runtime.InteropServices.Marshal]::PtrToStringAuto($B
 
 try {
     
-    $script:hvServer = Connect-HVServer -Server $horizonserver -User $username -Password $UnsecurePassword -Domain $domain
+    $script:hvServer = Connect-HVServer -Server $horizonserver -User $username -Password $UnsecurePassword -Domain $domain -Force
     $script:hvServices = $hvServer.ExtensionData
 
     }
@@ -77,18 +81,17 @@ Function GetSessions {
     }
 
 #Add Local CSV for Session Data
-Add-Content -Path C:\Sessions.csv  -Value '"Username","Pool Name","Machine Name","Client Name","Client Type","Client Version","Client IP","Session Type","Session State","Location","Idle Duration"'
+Add-Content -Path $script:mydocs\Sessions_$script:date.csv  -Value '"Username","Pool Name","Machine Name","Client Name","Client Type","Client Version","Client IP","Session Type","Session State","Location","Idle Duration"'
   
-write-host "Results will be logged to: "$sLogPath"\"$sLogName
 write-host "There are" $sresult.results.Count "total sessions"
 
-#$sresult.Results | Format-table -AutoSize -Property @{Name = 'Username'; Expression = {$_.namesdata.username}},@{Name = 'Pool Name'; Expression = {$_.namesdata.desktopname}},@{Name = 'Machine Name'; Expression = {$_.namesdata.machineorrdsservername}}`
-#,@{Name = 'Client Name'; Expression = {$_.namesdata.clientname}},@{Name = 'Client Type'; Expression = {$_.namesdata.clienttype}},@{Name = 'Client Version'; Expression = {$_.namesdata.clientversion}},@{Name = 'Client IP'; Expression = {$_.namesdata.clientaddress}}`
-#,@{Name = 'Session Type'; Expression = {$_.sessiondata.sessiontype}},@{Name = 'Session State'; Expression = {$_.sessiondata.sessionstate}},@{Name = 'Location'; Expression = {$_.namesdata.securityGatewayLocation}},@{Name = 'Idle Duration'; Expression = {$_.sessiondata.IdleDuration}}
+$sresult.Results | Format-table -AutoSize -Property @{Name = 'Username'; Expression = {$_.namesdata.username}},@{Name = 'Pool Name'; Expression = {$_.namesdata.desktopname}},@{Name = 'Machine Name'; Expression = {$_.namesdata.machineorrdsservername}}`
+,@{Name = 'Client Name'; Expression = {$_.namesdata.clientname}},@{Name = 'Client Type'; Expression = {$_.namesdata.clienttype}},@{Name = 'Client Version'; Expression = {$_.namesdata.clientversion}},@{Name = 'Client IP'; Expression = {$_.namesdata.clientaddress}}`
+,@{Name = 'Session Type'; Expression = {$_.sessiondata.sessiontype}},@{Name = 'Session State'; Expression = {$_.sessiondata.sessionstate}},@{Name = 'Location'; Expression = {$_.namesdata.securityGatewayLocation}},@{Name = 'Idle Duration'; Expression = {$_.sessiondata.IdleDuration}}
  
 $sresult.Results | Select-Object -Property @{Name = 'Username'; Expression = {$_.namesdata.username}},@{Name = 'Pool Name'; Expression = {$_.namesdata.desktopname}},@{Name = 'Machine Name'; Expression = {$_.namesdata.machineorrdsservername}}`
 ,@{Name = 'Client Name'; Expression = {$_.namesdata.clientname}},@{Name = 'Client Type'; Expression = {$_.namesdata.clienttype}},@{Name = 'Client Version'; Expression = {$_.namesdata.clientversion}},@{Name = 'Client IP'; Expression = {$_.namesdata.clientaddress}}`
-,@{Name = 'Session Type'; Expression = {$_.sessiondata.sessiontype}},@{Name = 'Session State'; Expression = {$_.sessiondata.sessionstate}},@{Name = 'Location'; Expression = {$_.namesdata.securityGatewayLocation}},@{Name = 'Idle Duration'; Expression = {$_.sessiondata.IdleDuration}} | Export-Csv -path c:\sesspom.csv -NoTypeInformation
+,@{Name = 'Session Type'; Expression = {$_.sessiondata.sessiontype}},@{Name = 'Session State'; Expression = {$_.sessiondata.sessionstate}},@{Name = 'Location'; Expression = {$_.namesdata.securityGatewayLocation}},@{Name = 'Idle Duration'; Expression = {$_.sessiondata.IdleDuration}} | Export-Csv -path $script:mydocs\Sessions_$script:date.csv -NoTypeInformation
 
   
 } 
@@ -97,19 +100,13 @@ $sresult.Results | Select-Object -Property @{Name = 'Username'; Expression = {$_
 function Show-Menu
   {
     param (
-          [string]$Title = 'VMware Horizon API Menu'
+          [string]$Title = 'VMware Horizon PowerCLI Menu'
           )
        Clear-Host
        Write-Host "================ $Title ================"
              
        Write-Host "Press '1' to Login to Horizon"
-       Write-Host "Press '2' for a List of Sessions"
-       Write-Host "Press '3' for a List of Applications"
-       Write-Host "Press '4' for a List of Machines"
-       Write-Host "Press '5' to Reboot a Desktop"
-       Write-Host "Press '6' for a List of Desktop Pools"
-       Write-Host "Press '7' for Connection Server Info"
-       Write-Host "Press '8' for Usage Info"
+       Write-Host "Press '2' to Export Sessions to a .CSV"
        Write-Host "Press 'Q' to quit."
          }
 
@@ -131,44 +128,10 @@ do
 
     }
     
-    '3' {
-       
-         GetApplications
-      
-    }
-
-    '4' {
-       
-     GetMachines
-   
- }
-
-
- '5' {
-       
-  RebootDT
 
 }
-
-'6' {
-       
-        GetDtPools
-     
-   }
-   '7' {
-       
-    GetCSInfo
- 
-}
-'8' {
-       
-  GetUsage
-
-}
-
-    }
     pause
- }
+}
  
  until ($selection -eq 'q')
 
