@@ -4,10 +4,16 @@
 Script to output Horizon Session data to .CSV via PowerCLI
 	
 .NOTES
-  Version:        1.0
+  Version:        1.1
   Author:         Chris Halstead - chalstead@vmware.com
   Creation Date:  1/20/2021
-  Purpose/Change: Initial script development
+  Purpose/Change: Updated for > 1,000 sessions and added Session Start Time
+
+  Thanks to Wouter Kursten for the guidance on returning more than 1,000 objects in this article:
+  https://www.retouw.nl/2017/12/12/get-hvmachine-only-finds-1000-desktops/
+
+  Also thanks to feedback on code.vmware.com I added Session Start Time
+  
  #>
 
 #----------------------------------------------------------[Declarations]----------------------------------------------------------
@@ -15,7 +21,6 @@ Script to output Horizon Session data to .CSV via PowerCLI
 $script:mydocs = [environment]::getfolderpath('mydocuments')
 $script:date = Get-Date -Format d 
 $script:date = $script:date -replace "/","_"
-
 #-----------------------------------------------------------[Functions]------------------------------------------------------------
 Function LogintoHorizon {
 
@@ -34,7 +39,6 @@ try {
     
     $script:hvServer = Connect-HVServer -Server $horizonserver -User $username -Password $UnsecurePassword -Domain $domain -Force
     $script:hvServices = $hvServer.ExtensionData
-
     }
 
 catch {
@@ -62,9 +66,33 @@ Function GetSessions {
       $query.queryEntityType = 'SessionLocalSummaryView'
       
       $qSrv = New-Object "Vmware.Hv.QueryServiceService"
+
+      #Support over 1000 sessions
+      $offset = 0
+      $qdef = New-Object VMware.Hv.QueryDefinition
+      $qdef.limit= 1000
+      $qdef.maxpagesize = 1000
+      $qdef.queryEntityType = 'SessionLocalSummaryView'
+
+      $ssessionoutput=@()
       
-      $sresult = $qSRv.QueryService_Query($hvServices,$query)
-              
+      do{
+        $qdef.startingoffset = $offset
+        $sResult = $qsrv.queryservice_create($hvServices, $qdef)
+            if (($sResult.results).count -eq 1000)
+                {
+                $maxresults = 1
+                }
+            else 
+                {
+                $maxresults = 0
+                }
+
+        $offset+=1000
+        $ssessionoutput+=$sResult
+        }
+      until ($maxresults -eq 0)
+                     
     }
     
     catch {
@@ -72,7 +100,7 @@ Function GetSessions {
      break 
     }
     
-  if ($sresult.results.count -eq 0)
+  if ($ssessionoutput.results.count -eq 0)
    {
     write-host "No Sessions"
     break   
@@ -80,15 +108,17 @@ Function GetSessions {
     }
 
 #Add Local CSV for Session Data
-Add-Content -Path $script:mydocs\Sessions_$script:date.csv  -Value '"Username","Pool Name","Machine Name","Client Name","Client Type","Client Version","Client IP","Session Type","Session State","Location","Idle Duration"'
+Add-Content -Path $script:mydocs\Sessions_$script:date.csv  -Value "Session Start Time",'"Username","Pool Name","Machine Name","Client Name","Client Type","Client Version","Client IP","Session Type","Session State","Location","Idle Duration"'
   
 write-host "There are" $sresult.results.Count "total sessions"
 
-$sresult.Results | Format-table -AutoSize -Property @{Name = 'Username'; Expression = {$_.namesdata.username}},@{Name = 'Pool Name'; Expression = {$_.namesdata.desktopname}},@{Name = 'Machine Name'; Expression = {$_.namesdata.machineorrdsservername}}`
+#Write results to table
+$ssessionoutput.Results | Format-table -AutoSize -Property @{Name = 'Session Start Time'; Expression = {$_.sessiondata.startTime}},@{Name = 'Username'; Expression = {$_.namesdata.username}},@{Name = 'Pool Name'; Expression = {$_.namesdata.desktopname}},@{Name = 'Machine Name'; Expression = {$_.namesdata.machineorrdsservername}}`
 ,@{Name = 'Client Name'; Expression = {$_.namesdata.clientname}},@{Name = 'Client Type'; Expression = {$_.namesdata.clienttype}},@{Name = 'Client Version'; Expression = {$_.namesdata.clientversion}},@{Name = 'Client IP'; Expression = {$_.namesdata.clientaddress}}`
 ,@{Name = 'Session Type'; Expression = {$_.sessiondata.sessiontype}},@{Name = 'Session State'; Expression = {$_.sessiondata.sessionstate}},@{Name = 'Location'; Expression = {$_.namesdata.securityGatewayLocation}},@{Name = 'Idle Duration'; Expression = {$_.sessiondata.IdleDuration}}
- 
-$sresult.Results | Select-Object -Property @{Name = 'Username'; Expression = {$_.namesdata.username}},@{Name = 'Pool Name'; Expression = {$_.namesdata.desktopname}},@{Name = 'Machine Name'; Expression = {$_.namesdata.machineorrdsservername}}`
+
+#Write results to .CSV file
+$ssessionoutput.Results | Select-Object -Property @{Name = 'Session Start Time'; Expression = {$_.sessiondata.startTime}},@{Name = 'Username'; Expression = {$_.namesdata.username}},@{Name = 'Pool Name'; Expression = {$_.namesdata.desktopname}},@{Name = 'Machine Name'; Expression = {$_.namesdata.machineorrdsservername}}`
 ,@{Name = 'Client Name'; Expression = {$_.namesdata.clientname}},@{Name = 'Client Type'; Expression = {$_.namesdata.clienttype}},@{Name = 'Client Version'; Expression = {$_.namesdata.clientversion}},@{Name = 'Client IP'; Expression = {$_.namesdata.clientaddress}}`
 ,@{Name = 'Session Type'; Expression = {$_.sessiondata.sessiontype}},@{Name = 'Session State'; Expression = {$_.sessiondata.sessionstate}},@{Name = 'Location'; Expression = {$_.namesdata.securityGatewayLocation}},@{Name = 'Idle Duration'; Expression = {$_.sessiondata.IdleDuration}} | Export-Csv -path $script:mydocs\Sessions_$script:date.csv -NoTypeInformation
 
