@@ -1,5 +1,4 @@
-1. # Horizon-Sessions
-
+# Horizon-Sessions
 Export VMware Horizon Session Data into .CSV
 
 This script will export Horizon Session data into a .CSV file in My Documents Folder.
@@ -49,5 +48,13 @@ Choose **1** to Login to a Horizon Connection Server
 
   You will see that you are now logged in to Horizon - click enter to go back to the menu
 
-   ![Login](https://github.com/chrisdhalstead/horizon-sessions/blob/master/Images/Login.PNG)
+   ![Login](https://github.com/chrisdhalstead/horizon-sessions/blob/main/Images/Login.PNG)
+
+#### Return Horizon Sessions
+
+Choose **2** to return Horizon Sessions.  They will be written to a table and also to a .CSV file in My Documents.
+
+   ![Sessions](https://github.com/chrisdhalstead/horizon-sessions/blob/main/Images/horizonsessions.PNG)
+
+Note that the location of the .CSV file will be written out after the script executes.
 
