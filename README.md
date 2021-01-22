@@ -54,7 +54,7 @@ Choose **1** to Login to a Horizon Connection Server
 
 Choose **2** to return Horizon Sessions.  They will be written to a table and also to a .CSV file in My Documents.
 
-   ![Sessions](https://github.com/chrisdhalstead/horizon-sessions/blob/main/Images/horizonsessions.PNG)
+   ![Sessions](https://github.com/chrisdhalstead/Horizon-Sessions/blob/main/Images/horizonsessions.png)
 
 Note that the location of the .CSV file will be written out after the script executes.
 
