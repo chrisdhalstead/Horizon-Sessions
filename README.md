@@ -37,3 +37,5 @@ This is a PowerShell script that uses PowerCLI and the View-API to query Horizon
    #### Login to Horizon Connection Server
 
 
+
+   ![Login](https://github.com/chrisdhalstead/horizon-sessions/blob/master/Images/Login.PNG)
