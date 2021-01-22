@@ -32,10 +32,11 @@ This is a PowerShell script that uses PowerCLI and the View-API to query Horizon
 1. Run `Horizon - Sessions.ps1` 
 
 
-   ![Menu](https://github.com/chrisdhalstead/horizon-sessions/blob/master/Images/sessionmenu.PNG)
+   ![Menu](https://github.com/chrisdhalstead/horizon-sessions/blob/master/images/sessionmenu.PNG)
 
    #### Login to Horizon Connection Server
 
 
 
-   ![Login](https://github.com/chrisdhalstead/horizon-sessions/blob/master/Images/Login.PNG)
+   ![Login](https://github.com/chrisdhalstead/horizon-sessions/blob/master/images/Login.PNG)
+
