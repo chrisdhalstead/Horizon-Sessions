@@ -1,4 +1,5 @@
-# Horizon-Sessions
+1. # Horizon-Sessions
+
 Export VMware Horizon Session Data into .CSV
 
 This script will export Horizon Session data into a .CSV file in My Documents Folder.
@@ -29,14 +30,24 @@ This is a PowerShell script that uses PowerCLI and the View-API to query Horizon
 
 ### Script Usage
 
-1. Run `Horizon - Sessions.ps1` 
+Run `Horizon - Sessions.ps1` 
 
 
-   ![Menu](https://github.com/chrisdhalstead/horizon-sessions/blob/master/images/sessionmenu.PNG)
+   ![Menu](https://github.com/chrisdhalstead/horizon-sessions/blob/master/Images/sessionmenu.PNG)
 
    #### Login to Horizon Connection Server
 
+Choose **1** to Login to a Horizon Connection Server 
 
+- Enter the FQDN of the server when prompted to "Enter the Horizon Server Name" hit enter
 
-   ![Login](https://github.com/chrisdhalstead/horizon-sessions/blob/master/images/Login.PNG)
+- Enter the Username of an account with Administrative access to the Horizon Server you are connecting to when prompted to "Enter the Username" hit enter
+
+- Enter that users Password and click enter
+
+- Enter that users Domain and click enter
+
+  You will see that you are now logged in to Horizon - click enter to go back to the menu
+
+   ![Login](https://github.com/chrisdhalstead/horizon-sessions/blob/master/Images/Login.PNG)
 
