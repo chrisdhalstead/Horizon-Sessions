@@ -19,6 +19,8 @@ The code to support that is based off of his post here:  https://www.retouw.nl/2
 
 Updated January 22, 2021<br />
 
+**Update to support over 1,000 Horizon Sessions**
+
 ------
 
 ### Script Overview
