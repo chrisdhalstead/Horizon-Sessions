@@ -108,17 +108,17 @@ Function GetSessions {
     }
 
 #Add Local CSV for Session Data
-Add-Content -Path $script:mydocs\Sessions_$script:date.csv  -Value "Session Start Time",'"Username","Pool Name","Machine Name","Client Name","Client Type","Client Version","Client IP","Session Type","Session State","Location","Idle Duration"'
+Add-Content -Path $script:mydocs\Sessions_$script:date.csv  -Value '"Session Start Time","Display Protocol","Username","Pool Name","Machine Name","Client Name","Client Type","Client Version","Client IP","Session Type","Session State","Location","Idle Duration"'
   
 write-host "There are" $sresult.results.Count "total sessions"
 
 #Write results to table
-$ssessionoutput.Results | Format-table -AutoSize -Property @{Name = 'Session Start Time'; Expression = {$_.sessiondata.startTime}},@{Name = 'Username'; Expression = {$_.namesdata.username}},@{Name = 'Pool Name'; Expression = {$_.namesdata.desktopname}},@{Name = 'Machine Name'; Expression = {$_.namesdata.machineorrdsservername}}`
+$ssessionoutput.Results | Format-table -AutoSize -Property @{Name = 'Session Start Time'; Expression = {$_.sessiondata.startTime}},@{Name = 'Display Protocol'; Expression = {$_.sessiondata.SessionProtocol}},@{Name = 'Username'; Expression = {$_.namesdata.username}},@{Name = 'Pool Name'; Expression = {$_.namesdata.desktopname}},@{Name = 'Machine Name'; Expression = {$_.namesdata.machineorrdsservername}}`
 ,@{Name = 'Client Name'; Expression = {$_.namesdata.clientname}},@{Name = 'Client Type'; Expression = {$_.namesdata.clienttype}},@{Name = 'Client Version'; Expression = {$_.namesdata.clientversion}},@{Name = 'Client IP'; Expression = {$_.namesdata.clientaddress}}`
 ,@{Name = 'Session Type'; Expression = {$_.sessiondata.sessiontype}},@{Name = 'Session State'; Expression = {$_.sessiondata.sessionstate}},@{Name = 'Location'; Expression = {$_.namesdata.securityGatewayLocation}},@{Name = 'Idle Duration'; Expression = {$_.sessiondata.IdleDuration}}
 
 #Write results to .CSV file
-$ssessionoutput.Results | Select-Object -Property @{Name = 'Session Start Time'; Expression = {$_.sessiondata.startTime}},@{Name = 'Username'; Expression = {$_.namesdata.username}},@{Name = 'Pool Name'; Expression = {$_.namesdata.desktopname}},@{Name = 'Machine Name'; Expression = {$_.namesdata.machineorrdsservername}}`
+$ssessionoutput.Results | Select-Object -Property @{Name = 'Session Start Time'; Expression = {$_.sessiondata.startTime}},@{Name = 'Display Protocol'; Expression = {$_.sessiondata.SessionProtocol}},@{Name = 'Username'; Expression = {$_.namesdata.username}},@{Name = 'Pool Name'; Expression = {$_.namesdata.desktopname}},@{Name = 'Machine Name'; Expression = {$_.namesdata.machineorrdsservername}}`
 ,@{Name = 'Client Name'; Expression = {$_.namesdata.clientname}},@{Name = 'Client Type'; Expression = {$_.namesdata.clienttype}},@{Name = 'Client Version'; Expression = {$_.namesdata.clientversion}},@{Name = 'Client IP'; Expression = {$_.namesdata.clientaddress}}`
 ,@{Name = 'Session Type'; Expression = {$_.sessiondata.sessiontype}},@{Name = 'Session State'; Expression = {$_.sessiondata.sessionstate}},@{Name = 'Location'; Expression = {$_.namesdata.securityGatewayLocation}},@{Name = 'Idle Duration'; Expression = {$_.sessiondata.IdleDuration}} | Export-Csv -path $script:mydocs\Sessions_$script:date.csv -NoTypeInformation
 
