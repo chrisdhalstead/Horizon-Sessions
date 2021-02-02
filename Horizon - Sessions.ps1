@@ -92,6 +92,9 @@ Function GetSessions {
         $ssessionoutput+=$sResult
         }
       until ($maxresults -eq 0)
+      
+      #Cleanup the query
+      $qsrv.QueryService_Delete($hvServices, $sresult.id)
                      
     }
     
